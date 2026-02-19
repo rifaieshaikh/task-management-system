@@ -1,7 +1,6 @@
-# Multi-stage build for React application
-
-# Stage 1: Build
+# Build stage
 FROM node:18-alpine AS build
+
 WORKDIR /app
 
 # Copy package files
@@ -13,28 +12,24 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build argument for API URL
-ARG REACT_APP_API_URL
-ENV REACT_APP_API_URL=$REACT_APP_API_URL
-
-# Build application
+# Build the application
 RUN npm run build
 
-# Stage 2: Production with Nginx
-FROM nginx:1.25-alpine
-WORKDIR /usr/share/nginx/html
-
-# Remove default nginx static assets
-RUN rm -rf ./*
-
-# Copy built app from build stage
-COPY --from=build /app/build .
+# Production stage
+FROM nginx:alpine
 
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose port
+# Copy built application from build stage
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Expose port 80
 EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]

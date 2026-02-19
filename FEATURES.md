@@ -382,14 +382,6 @@ Search Syntax:
 | Rate Limiting | ✅ Complete | - |
 | Health Checks | ✅ Complete | - |
 | API Documentation | ✅ Complete | - |
-| User Authentication | 📋 Planned | High |
-| Task Categories | 📋 Planned | High |
-| File Attachments | 📋 Planned | Medium |
-| Comments | 📋 Planned | Medium |
-| Notifications | 📋 Planned | Medium |
-| Recurring Tasks | 📋 Planned | Low |
-| Mobile App | 📋 Planned | Low |
-| Integrations | 📋 Planned | Low |
 
 ## Performance Metrics
 
