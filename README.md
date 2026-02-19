@@ -1,72 +1,89 @@
 # Task Management System
 
-A full-stack task management application built with Spring Boot, React, TypeScript, and PostgreSQL, containerized with Docker.
+A full-stack task management application built with Spring Boot, React, TypeScript, and PostgreSQL. Features a modern Material-UI interface, Redux state management, and comprehensive REST API with Swagger documentation.
 
 ## 🚀 Features
 
-### Core Functionality
-- ✅ Create, read, update, and delete tasks
-- ✅ Toggle task completion status directly from list view
-- ✅ Pagination for efficient data handling
-- ✅ Sorting by title, due date, or creation date
-- ✅ Filtering by completion status
-- ✅ Search tasks by title or description
-- ✅ Form validation with user-friendly error messages
-- ✅ Responsive Material-UI design
-
-### Technical Features
-- 🏗️ RESTful API with proper HTTP methods and status codes
-- 📚 **Swagger/OpenAPI documentation** - Interactive API documentation
-- 🔄 **Flyway database migrations** - Version-controlled schema management
-- 🔄 Redux state management with Redux Toolkit
-- 🧪 Comprehensive unit and integration tests
-- 🎭 End-to-end tests with Playwright
-- 🐳 Docker containerization for easy deployment
-- 📝 Clean, maintainable code with proper project structure
-
----
-
-## 📋 Table of Contents
-
-- [Technology Stack](#technology-stack)
-- [Project Structure](#project-structure)
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [Development Setup](#development-setup)
-- [Testing](#testing)
-- [API Documentation](#api-documentation)
-- [Architecture](#architecture)
-- [Contributing](#contributing)
-
----
-
-## 🛠️ Technology Stack
-
 ### Backend
-- **Java 21** - Latest LTS version with modern features
-- **Spring Boot 3.2+** - Enterprise-grade framework
-- **Spring Data JPA** - Database abstraction layer
-- **PostgreSQL 16** - Robust relational database
-- **Flyway** - Database migration tool
-- **SpringDoc OpenAPI** - Swagger/OpenAPI 3.0 documentation
-- **Maven** - Dependency management
-- **JUnit 5 & Mockito** - Testing framework
+- ✅ **RESTful API** with Spring Boot 3.2+ and Java 21
+- 🗄️ **PostgreSQL Database** with Flyway migrations
+- 📚 **Swagger/OpenAPI Documentation** for interactive API testing
+- 🔒 **Bean Validation** for input validation
+- 🎯 **Global Exception Handling** with user-friendly error messages
+- 🔍 **Advanced Search & Filtering** with pagination and sorting
+- 🐳 **Docker Support** with multi-stage builds
+- 📊 **Health Checks** with Spring Boot Actuator
 
 ### Frontend
-- **React 18** - Modern UI library
-- **TypeScript 5.x** - Type-safe JavaScript
-- **Redux Toolkit** - State management
-- **Material-UI (MUI)** - Component library
-- **React Router v6** - Client-side routing
-- **Axios** - HTTP client
-- **Jest & React Testing Library** - Unit testing
-- **Playwright** - E2E testing
+- ⚛️ **React 19** with TypeScript for type safety
+- 🎨 **Material-UI** for modern, responsive design
+- 🔄 **Redux Toolkit** for state management
+- 🔍 **Real-time Search** with debouncing
+- 📄 **Pagination** for efficient data handling
+- 🎯 **Smart Filtering** by completion status
+- 📊 **Flexible Sorting** by multiple fields
+- ✨ **Form Validation** with user feedback
+- 🚨 **Error Handling** with alerts
 
-### DevOps
-- **Docker** - Containerization
-- **Docker Compose** - Multi-container orchestration
+## 📋 Prerequisites
 
----
+- **Java**: 21 (LTS)
+- **Node.js**: 18.x or higher
+- **PostgreSQL**: 16 or higher
+- **Maven**: 3.8+ (or use Maven wrapper)
+- **Docker & Docker Compose**: (optional, for containerized deployment)
+
+## 🛠️ Quick Start
+
+### Option 1: Docker Compose (Recommended)
+
+Start all services with a single command:
+
+```bash
+docker-compose up -d
+```
+
+Access the application:
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8080
+- **Swagger UI**: http://localhost:8080/swagger-ui.html
+- **PostgreSQL**: localhost:5432
+
+### Option 2: Local Development
+
+#### 1. Start PostgreSQL
+
+```bash
+# Using Docker
+docker run -d \
+  --name task-db \
+  -e POSTGRES_DB=taskdb \
+  -e POSTGRES_USER=taskuser \
+  -e POSTGRES_PASSWORD=taskpass \
+  -p 5432:5432 \
+  postgres:16-alpine
+
+# Or use your local PostgreSQL installation
+```
+
+#### 2. Start Backend
+
+```bash
+cd backend
+./mvnw spring-boot:run
+```
+
+Backend will start on http://localhost:8080
+
+#### 3. Start Frontend
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+Frontend will start on http://localhost:3000
 
 ## 📁 Project Structure
 
@@ -76,148 +93,199 @@ task-management-system/
 │   ├── src/
 │   │   ├── main/
 │   │   │   ├── java/com/taskmanagement/
-│   │   │   │   ├── controller/      # REST controllers
-│   │   │   │   ├── service/         # Business logic
-│   │   │   │   ├── repository/      # Data access
-│   │   │   │   ├── entity/          # JPA entities
-│   │   │   │   ├── dto/             # Data transfer objects
-│   │   │   │   ├── exception/       # Exception handling
-│   │   │   │   └── config/          # Configuration
+│   │   │   │   ├── config/           # Configuration classes
+│   │   │   │   ├── controller/       # REST controllers
+│   │   │   │   ├── dto/              # Data Transfer Objects
+│   │   │   │   ├── entity/           # JPA entities
+│   │   │   │   ├── exception/        # Exception handling
+│   │   │   │   ├── repository/       # Data access layer
+│   │   │   │   └── service/          # Business logic
 │   │   │   └── resources/
-│   │   │       └── application.yml  # App configuration
-│   │   └── test/                    # Unit & integration tests
+│   │   │       ├── db/migration/     # Flyway migrations
+│   │   │       ├── application.yml   # Configuration
+│   │   │       └── application-docker.yml
+│   │   └── test/                     # Unit & integration tests
 │   ├── Dockerfile
 │   ├── pom.xml
 │   └── README.md
-├── frontend/                   # React frontend
+├── frontend/                   # React TypeScript frontend
+│   ├── public/                # Static assets
 │   ├── src/
-│   │   ├── api/                # API service layer
-│   │   ├── components/         # React components
-│   │   ├── pages/              # Page components
-│   │   ├── store/              # Redux store & slices
-│   │   ├── types/              # TypeScript types
-│   │   └── utils/              # Utility functions
-│   ├── e2e/                    # Playwright E2E tests
+│   │   ├── api/               # API service layer
+│   │   ├── components/        # React components
+│   │   │   ├── common/        # Reusable components
+│   │   │   ├── TaskList/      # Task list components
+│   │   │   └── TaskForm/      # Task form components
+│   │   ├── store/             # Redux store
+│   │   │   └── slices/        # Redux slices
+│   │   ├── theme/             # Material-UI theme
+│   │   ├── types/             # TypeScript types
+│   │   ├── utils/             # Utility functions
+│   │   ├── App.tsx            # Root component
+│   │   └── index.tsx          # Entry point
 │   ├── Dockerfile
 │   ├── nginx.conf
 │   ├── package.json
 │   └── README.md
-├── plans/                      # Architecture & planning docs
+├── plans/                      # Project documentation
 │   ├── architecture-plan.md
 │   ├── implementation-guide.md
 │   ├── frontend-implementation.md
-│   └── docker-setup.md
-├── docker-compose.yml          # Multi-container setup
+│   ├── docker-setup.md
+│   ├── flyway-swagger-integration.md
+│   └── git-workflow.md
+├── docker-compose.yml
+├── .gitignore
 └── README.md                   # This file
 ```
 
----
+## 🔌 API Endpoints
 
-## ✅ Prerequisites
+### Tasks API
 
-Before you begin, ensure you have the following installed:
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/tasks` | Get all tasks (with pagination, sorting, filtering) |
+| GET | `/api/tasks/{id}` | Get task by ID |
+| POST | `/api/tasks` | Create a new task |
+| PUT | `/api/tasks/{id}` | Update a task |
+| PATCH | `/api/tasks/{id}/toggle` | Toggle task completion |
+| DELETE | `/api/tasks/{id}` | Delete a task |
 
-- **Docker** (version 20.10+) and **Docker Compose** (version 2.0+)
-  - [Install Docker Desktop](https://www.docker.com/products/docker-desktop)
-  
-For local development without Docker:
-- **Java 21** JDK
-- **Maven 3.8+**
-- **Node.js 18+** and npm
-- **PostgreSQL 16**
+### Query Parameters
 
----
+- `search`: Search in title and description
+- `isCompleted`: Filter by completion status (true/false)
+- `page`: Page number (0-indexed)
+- `size`: Page size (default: 10)
+- `sort`: Sort field and direction (e.g., `createdAt,desc`)
 
-## 🚀 Quick Start
+### Example Requests
 
-### Using Docker (Recommended)
+```bash
+# Get all tasks
+curl http://localhost:8080/api/tasks
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd task-management-system
-   ```
+# Search tasks
+curl "http://localhost:8080/api/tasks?search=meeting"
 
-2. **Start all services**
-   ```bash
-   docker-compose up --build
-   ```
+# Filter completed tasks
+curl "http://localhost:8080/api/tasks?isCompleted=true"
 
-3. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8080/api
-   - **Swagger UI**: http://localhost:8080/swagger-ui.html
-   - Database: localhost:5432
+# Pagination and sorting
+curl "http://localhost:8080/api/tasks?page=0&size=10&sort=dueDate,asc"
 
-4. **Stop the application**
-   ```bash
-   docker-compose down
-   ```
+# Create a task
+curl -X POST http://localhost:8080/api/tasks \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Complete project",
+    "description": "Finish the task management system",
+    "dueDate": "2024-12-31"
+  }'
 
-That's it! The application is now running with all services containerized.
+# Update a task
+curl -X PUT http://localhost:8080/api/tasks/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Updated title",
+    "isCompleted": true
+  }'
 
----
+# Toggle completion
+curl -X PATCH http://localhost:8080/api/tasks/1/toggle
 
-## 💻 Development Setup
+# Delete a task
+curl -X DELETE http://localhost:8080/api/tasks/1
+```
 
-### Backend Development
+## 📚 API Documentation
 
-1. **Navigate to backend directory**
-   ```bash
-   cd backend
-   ```
+Interactive API documentation is available via Swagger UI:
 
-2. **Start PostgreSQL** (if not using Docker)
-   ```bash
-   docker-compose up postgres
-   ```
-   Or install PostgreSQL locally and create database:
-   ```sql
-   CREATE DATABASE taskdb;
-   CREATE USER taskuser WITH PASSWORD 'taskpass';
-   GRANT ALL PRIVILEGES ON DATABASE taskdb TO taskuser;
-   ```
+**Local**: http://localhost:8080/swagger-ui.html
 
-3. **Run the application**
-   ```bash
-   mvn spring-boot:run
-   ```
-   
-   Or with your IDE:
-   - Open project in IntelliJ IDEA or Eclipse
-   - Run `TaskManagementApplication.java`
+**Docker**: http://localhost:8080/swagger-ui.html
 
-4. **Verify backend is running**
-   ```bash
-   curl http://localhost:8080/api/tasks
-   ```
+The Swagger UI provides:
+- Complete API documentation
+- Request/response schemas
+- Interactive testing interface
+- Example requests and responses
 
-### Frontend Development
+## 🗄️ Database Schema
 
-1. **Navigate to frontend directory**
-   ```bash
-   cd frontend
-   ```
+### Tasks Table
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | BIGSERIAL | PRIMARY KEY |
+| title | VARCHAR(200) | NOT NULL |
+| description | TEXT | NULL |
+| is_completed | BOOLEAN | NOT NULL, DEFAULT false |
+| due_date | DATE | NULL |
+| created_at | TIMESTAMP | NOT NULL |
+| updated_at | TIMESTAMP | NOT NULL |
 
-3. **Create environment file**
-   ```bash
-   echo "REACT_APP_API_URL=http://localhost:8080/api" > .env
-   ```
+### Indexes
 
-4. **Start development server**
-   ```bash
-   npm start
-   ```
+- `idx_tasks_is_completed`: For filtering by completion status
+- `idx_tasks_due_date`: For sorting by due date
+- `idx_tasks_created_at`: For sorting by creation date
 
-5. **Access the application**
-   - Open browser to http://localhost:3000
+## 🐳 Docker Deployment
 
----
+### Build Images
+
+```bash
+# Build all images
+docker-compose build
+
+# Build specific service
+docker-compose build backend
+docker-compose build frontend
+```
+
+### Start Services
+
+```bash
+# Start all services
+docker-compose up -d
+
+# Start specific service
+docker-compose up -d backend
+
+# View logs
+docker-compose logs -f
+
+# View logs for specific service
+docker-compose logs -f backend
+```
+
+### Stop Services
+
+```bash
+# Stop all services
+docker-compose down
+
+# Stop and remove volumes
+docker-compose down -v
+```
+
+### Health Checks
+
+All services include health checks:
+
+```bash
+# Check service health
+docker-compose ps
+
+# Backend health endpoint
+curl http://localhost:8080/actuator/health
+
+# Frontend health check
+curl http://localhost:3000
+```
 
 ## 🧪 Testing
 
@@ -227,16 +295,13 @@ That's it! The application is now running with all services containerized.
 cd backend
 
 # Run all tests
-mvn test
+./mvnw test
 
-# Run tests with coverage
-mvn test jacoco:report
+# Run with coverage
+./mvnw test jacoco:report
 
-# Run specific test class
-mvn test -Dtest=TaskServiceTest
-
-# Run integration tests
-mvn verify
+# Run specific test
+./mvnw test -Dtest=TaskServiceTest
 ```
 
 ### Frontend Tests
@@ -244,278 +309,271 @@ mvn verify
 ```bash
 cd frontend
 
-# Run unit tests
+# Run all tests
 npm test
 
-# Run tests with coverage
-npm run test:coverage
+# Run with coverage
+npm test -- --coverage
+
+# Run specific test
+npm test -- TaskList.test.tsx
+```
+
+### E2E Tests (Playwright)
+
+```bash
+cd frontend
+
+# Install Playwright
+npx playwright install
 
 # Run E2E tests
 npm run test:e2e
 
-# Run E2E tests with UI
+# Run in UI mode
 npm run test:e2e:ui
 ```
-
----
-
-## 📚 API Documentation
-
-### Base URL
-```
-http://localhost:8080/api
-```
-
-### Endpoints
-
-#### Get All Tasks
-```http
-GET /tasks?page=0&size=10&sort=createdAt,desc&completed=false&search=keyword
-```
-
-**Query Parameters:**
-- `page` (optional): Page number (default: 0)
-- `size` (optional): Page size (default: 10)
-- `sortBy` (optional): Sort field (default: createdAt)
-- `sortOrder` (optional): Sort order - asc/desc (default: desc)
-- `completed` (optional): Filter by completion status
-- `search` (optional): Search in title and description
-
-**Response:** `200 OK`
-```json
-{
-  "content": [
-    {
-      "id": 1,
-      "title": "Complete project",
-      "description": "Finish the task management system",
-      "isCompleted": false,
-      "dueDate": "2026-02-25",
-      "createdAt": "2026-02-19T09:00:00Z",
-      "updatedAt": "2026-02-19T09:00:00Z"
-    }
-  ],
-  "totalElements": 1,
-  "totalPages": 1,
-  "pageable": {
-    "pageNumber": 0,
-    "pageSize": 10
-  }
-}
-```
-
-#### Get Task by ID
-```http
-GET /tasks/{id}
-```
-
-**Response:** `200 OK` or `404 Not Found`
-
-#### Create Task
-```http
-POST /tasks
-Content-Type: application/json
-
-{
-  "title": "New task",
-  "description": "Task description",
-  "dueDate": "2026-02-25"
-}
-```
-
-**Response:** `201 Created`
-
-#### Update Task
-```http
-PUT /tasks/{id}
-Content-Type: application/json
-
-{
-  "title": "Updated task",
-  "description": "Updated description",
-  "isCompleted": true,
-  "dueDate": "2026-02-26"
-}
-```
-
-**Response:** `200 OK` or `404 Not Found`
-
-#### Toggle Task Completion
-```http
-PATCH /tasks/{id}/toggle
-```
-
-**Response:** `200 OK` or `404 Not Found`
-
-#### Delete Task
-```http
-DELETE /tasks/{id}
-```
-
-**Response:** `204 No Content` or `404 Not Found`
-
-### Error Response Format
-```json
-{
-  "timestamp": "2026-02-19T09:20:00Z",
-  "status": 400,
-  "error": "Bad Request",
-  "message": "Title is required",
-  "path": "/api/tasks"
-}
-```
-
----
-
-## 🏗️ Architecture
-
-### Backend Architecture
-
-The backend follows a **layered architecture** pattern:
-
-```
-Controller Layer → Service Layer → Repository Layer → Database
-```
-
-- **Controller Layer**: Handles HTTP requests/responses, input validation
-- **Service Layer**: Contains business logic, transaction management
-- **Repository Layer**: Data access using Spring Data JPA
-- **Entity Layer**: JPA entities representing database tables
-
-### Frontend Architecture
-
-The frontend uses **Redux** for state management:
-
-```
-Components → Redux Actions → Async Thunks → API → Backend
-                ↓
-           Redux Store
-                ↓
-           Components (re-render)
-```
-
-### Key Design Decisions
-
-1. **DTO Pattern**: Separate DTOs for API contracts vs. internal entities
-2. **Redux Toolkit**: Modern Redux with built-in best practices
-3. **Material-UI**: Consistent, accessible UI components
-4. **Docker**: Containerization for consistent environments
-5. **Server-side Pagination**: Efficient handling of large datasets
-
-For detailed architecture documentation, see [`plans/architecture-plan.md`](plans/architecture-plan.md).
-
----
 
 ## 🔧 Configuration
 
 ### Backend Configuration
 
-**File**: [`backend/src/main/resources/application.yml`](backend/src/main/resources/application.yml)
+Edit `backend/src/main/resources/application.yml`:
 
-Key configurations:
-- Database connection settings
-- JPA/Hibernate settings
-- Server port
-- CORS configuration
-- Logging levels
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/taskdb
+    username: taskuser
+    password: taskpass
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+```
 
 ### Frontend Configuration
 
-**File**: [`frontend/.env`](frontend/.env)
+Create `frontend/.env`:
 
 ```env
-REACT_APP_API_URL=http://localhost:8080/api
+REACT_APP_API_BASE_URL=http://localhost:8080
 ```
 
----
+## 🚀 Production Deployment
 
-## 🐳 Docker Commands
+### Backend
 
 ```bash
-# Build and start all services
-docker-compose up --build
+cd backend
 
-# Start in detached mode
-docker-compose up -d
+# Build JAR
+./mvnw clean package -DskipTests
 
-# View logs
-docker-compose logs -f
-
-# Stop all services
-docker-compose down
-
-# Stop and remove volumes
-docker-compose down -v
-
-# Rebuild specific service
-docker-compose build backend
-docker-compose up -d backend
+# Run JAR
+java -jar target/task-management-0.0.1-SNAPSHOT.jar
 ```
 
-For more Docker commands, see [`plans/docker-setup.md`](plans/docker-setup.md).
+### Frontend
 
----
+```bash
+cd frontend
 
-## 📖 Additional Documentation
+# Build production bundle
+npm run build
 
-- **[Architecture Plan](plans/architecture-plan.md)** - Detailed architecture and design decisions
-- **[Implementation Guide](plans/implementation-guide.md)** - Step-by-step backend implementation
-- **[Frontend Implementation](plans/frontend-implementation.md)** - Frontend setup and components
-- **[Docker Setup](plans/docker-setup.md)** - Docker configuration and commands
-- **[Backend README](backend/README.md)** - Backend-specific documentation
-- **[Frontend README](frontend/README.md)** - Frontend-specific documentation
+# Serve with nginx or any static server
+serve -s build
+```
 
----
+### Docker Production
+
+```bash
+# Build production images
+docker-compose -f docker-compose.yml build
+
+# Deploy
+docker-compose up -d
+```
+
+## 🔒 Security
+
+### Implemented Security Measures
+
+1. **Input Validation**: Bean Validation on all DTOs
+2. **SQL Injection Prevention**: JPA/Hibernate parameterized queries
+3. **CORS Configuration**: Controlled cross-origin access
+4. **Error Handling**: No sensitive data in error responses
+5. **Security Headers**: Set in Nginx configuration
+6. **Environment Variables**: Sensitive data in `.env` files
+
+### Production Recommendations
+
+- Enable HTTPS/TLS
+- Use strong database passwords
+- Implement authentication (JWT/OAuth2)
+- Add rate limiting
+- Enable security headers
+- Regular dependency updates
+- Database connection pooling
+- Implement logging and monitoring
+
+## 📊 Performance Optimization
+
+### Backend
+
+- Database indexes on frequently queried columns
+- Pagination for large datasets
+- Connection pooling with HikariCP
+- Lazy loading for JPA relationships
+- Caching with Spring Cache (optional)
+
+### Frontend
+
+- Code splitting with React lazy loading
+- Debounced search (500ms delay)
+- Memoization with React.memo
+- Production build minification
+- Gzip compression in Nginx
+- Static asset caching
+
+## 🐛 Troubleshooting
+
+### Backend Issues
+
+**Issue**: Database connection failed
+```bash
+# Check PostgreSQL is running
+docker ps | grep postgres
+
+# Check connection
+psql -h localhost -U taskuser -d taskdb
+```
+
+**Issue**: Port 8080 already in use
+```bash
+# Change port in application.yml
+server:
+  port: 8081
+```
+
+### Frontend Issues
+
+**Issue**: API connection failed
+```bash
+# Check backend is running
+curl http://localhost:8080/api/tasks
+
+# Verify .env configuration
+cat frontend/.env
+```
+
+**Issue**: Port 3000 already in use
+```bash
+# Use different port
+PORT=3001 npm start
+```
+
+### Docker Issues
+
+**Issue**: Container fails to start
+```bash
+# Check logs
+docker-compose logs backend
+
+# Rebuild images
+docker-compose build --no-cache
+```
+
+## 📝 Development Workflow
+
+### Git Commit Convention
+
+This project follows [Conventional Commits](https://www.conventionalcommits.org/):
+
+- `feat:` New features
+- `fix:` Bug fixes
+- `docs:` Documentation changes
+- `style:` Code style changes
+- `refactor:` Code refactoring
+- `test:` Test additions/changes
+- `chore:` Build process or auxiliary tool changes
+
+### Branch Strategy
+
+- `main`: Production-ready code
+- `develop`: Development branch
+- `feature/*`: Feature branches
+- `bugfix/*`: Bug fix branches
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'feat: add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
 
-### Code Style
+## 📄 License
 
-- **Backend**: Follow Java coding conventions, use Lombok for boilerplate reduction
-- **Frontend**: Follow Airbnb React/TypeScript style guide
-- **Commits**: Use conventional commits format
+This project is licensed under the MIT License.
 
----
+## 👥 Authors
 
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
+- **Development Team** - Initial work
 
 ## 🙏 Acknowledgments
 
 - Spring Boot team for the excellent framework
-- React team for the powerful UI library
-- Material-UI team for the beautiful components
+- React team for the amazing library
+- Material-UI for the component library
+- PostgreSQL team for the robust database
 - All open-source contributors
-
----
 
 ## 📞 Support
 
-For issues, questions, or contributions, please open an issue on GitHub.
+For issues and questions:
+- Create an issue on GitHub
+- Check the documentation in `/plans` directory
+- Review backend README: `backend/README.md`
+- Review frontend README: `frontend/README.md`
 
----
+## 🎯 Project Status
 
-## 🗺️ Roadmap
+### Completed ✅
+- Backend API with full CRUD operations
+- Frontend UI with all features
+- Docker deployment configuration
+- Comprehensive documentation
+- Database migrations with Flyway
+- API documentation with Swagger
+- Redux state management
+- Material-UI theming
+- Error handling and validation
 
-Future enhancements:
-- [ ] User authentication and authorization (JWT)
-- [ ] Task categories and tags
-- [ ] Task priority levels
-- [ ] Recurring tasks
-- [ ] Email notifications
-- [ ] File attachments
-- [ ] Task comments
-- [ ] Analytics dashboard
-- [ ] Mobile application
+### Pending 🚧
+- Backend unit and integration tests
+- Frontend component tests
+- E2E tests with Playwright
+- Authentication and authorization
+- User management
+- Task categories/tags
+- File attachments
+- Email notifications
+
+## 📈 Statistics
+
+- **Total Commits**: 29+
+- **Backend Files**: 20+
+- **Frontend Files**: 25+
+- **API Endpoints**: 6
+- **Components**: 5+
+- **Lines of Code**: 3000+
 
 ---
 
