@@ -14,6 +14,9 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     // Find by completion status
     Page<Task> findByIsCompleted(Boolean isCompleted, Pageable pageable);
     
+    // Check if task exists by title (case-insensitive)
+    boolean existsByTitleIgnoreCase(String title);
+    
     // Search by title or description
     @Query("SELECT t FROM Task t WHERE " +
            "LOWER(t.title) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
