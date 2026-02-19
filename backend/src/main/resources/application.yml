@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: task-management-backend
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/taskdb
+    username: taskuser
+    password: taskpass
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    baseline-version: 0
+    validate-on-migrate: true
+    out-of-order: false
+    
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: UTC
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# SpringDoc OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
+    show-extensions: true
+    show-common-extensions: true
+
+# CORS Configuration
+cors:
+  allowed-origins: http://localhost:3000
+
+logging:
+  level:
+    com.taskmanagement: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.flywaydb: INFO
