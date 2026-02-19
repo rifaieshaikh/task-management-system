@@ -73,15 +73,17 @@ export interface TaskFilters {
   page?: number;
   size?: number;
   sort?: string;
+  sortBy?: SortField;
+  sortDirection?: SortDirection;
 }
 
 /**
  * Sort options for tasks
  */
-export type TaskSortField = 'title' | 'dueDate' | 'createdAt' | 'updatedAt';
+export type SortField = 'title' | 'dueDate' | 'createdAt' | 'updatedAt';
 export type SortDirection = 'asc' | 'desc';
 
 export interface TaskSort {
-  field: TaskSortField;
+  field: SortField;
   direction: SortDirection;
 }

@@ -2,21 +2,19 @@ import React from 'react';
 import { Alert, AlertTitle, Box } from '@mui/material';
 
 interface ErrorAlertProps {
-  error: string | null;
+  message: string;
   onClose?: () => void;
 }
 
 /**
  * Error alert component for displaying error messages
  */
-const ErrorAlert: React.FC<ErrorAlertProps> = ({ error, onClose }) => {
-  if (!error) return null;
-
+const ErrorAlert: React.FC<ErrorAlertProps> = ({ message, onClose }) => {
   return (
     <Box mb={2}>
       <Alert severity="error" onClose={onClose}>
         <AlertTitle>Error</AlertTitle>
-        {error}
+        {message}
       </Alert>
     </Box>
   );
