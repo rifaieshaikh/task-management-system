@@ -4,7 +4,7 @@ import taskApi from '../../api/taskApi';
 import { AxiosError } from 'axios';
 
 /**
- * Task state interface
+ * Task state interface with optimistic updates support
  */
 interface TaskState {
   tasks: Task[];
@@ -16,6 +16,8 @@ interface TaskState {
   loading: boolean;
   error: string | null;
   filters: TaskFilters;
+  optimisticUpdates: Record<number, Task>; // Store original state for rollback
+  retryQueue: Array<{ action: string; payload: any; timestamp: number }>; // Queue for failed operations
 }
 
 /**
@@ -37,6 +39,8 @@ const initialState: TaskState = {
     size: 10,
     sort: 'createdAt,desc',
   },
+  optimisticUpdates: {},
+  retryQueue: [],
 };
 
 /**
@@ -154,7 +158,7 @@ export const deleteTask = createAsyncThunk<
 });
 
 /**
- * Task slice
+ * Task slice with optimistic updates and rollback support
  */
 const taskSlice = createSlice({
   name: 'tasks',
@@ -168,6 +172,50 @@ const taskSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
+    },
+    // Optimistic update for task completion toggle
+    optimisticToggleCompletion: (state, action: PayloadAction<number>) => {
+      const taskId = action.payload;
+      const taskIndex = state.tasks.findIndex((t) => t.id === taskId);
+      
+      if (taskIndex !== -1) {
+        // Store original state for potential rollback
+        state.optimisticUpdates[taskId] = { ...state.tasks[taskIndex] };
+        // Apply optimistic update
+        state.tasks[taskIndex].isCompleted = !state.tasks[taskIndex].isCompleted;
+      }
+    },
+    // Rollback optimistic update on failure
+    rollbackOptimisticUpdate: (state, action: PayloadAction<number>) => {
+      const taskId = action.payload;
+      const originalTask = state.optimisticUpdates[taskId];
+      
+      if (originalTask) {
+        const taskIndex = state.tasks.findIndex((t) => t.id === taskId);
+        if (taskIndex !== -1) {
+          state.tasks[taskIndex] = originalTask;
+        }
+        delete state.optimisticUpdates[taskId];
+      }
+    },
+    // Clear optimistic update after successful operation
+    clearOptimisticUpdate: (state, action: PayloadAction<number>) => {
+      delete state.optimisticUpdates[action.payload];
+    },
+    // Add failed operation to retry queue
+    addToRetryQueue: (state, action: PayloadAction<{ action: string; payload: any }>) => {
+      state.retryQueue.push({
+        ...action.payload,
+        timestamp: Date.now(),
+      });
+    },
+    // Remove operation from retry queue
+    removeFromRetryQueue: (state, action: PayloadAction<number>) => {
+      state.retryQueue.splice(action.payload, 1);
+    },
+    // Clear entire retry queue
+    clearRetryQueue: (state) => {
+      state.retryQueue = [];
     },
   },
   extraReducers: (builder) => {
@@ -242,22 +290,29 @@ const taskSlice = createSlice({
         state.error = action.payload || 'Failed to update task';
       });
 
-    // Toggle task completion
+    // Toggle task completion with optimistic update support
     builder
       .addCase(toggleTaskCompletion.pending, (state) => {
+        // Don't set loading for optimistic updates
         state.error = null;
       })
       .addCase(toggleTaskCompletion.fulfilled, (state, action) => {
-        const index = state.tasks.findIndex((t) => t.id === action.payload.id);
+        const taskId = action.payload.id;
+        // Clear optimistic update on success
+        delete state.optimisticUpdates[taskId];
+        
+        // Update with server response
+        const index = state.tasks.findIndex((t) => t.id === taskId);
         if (index !== -1) {
           state.tasks[index] = action.payload;
         }
-        if (state.currentTask?.id === action.payload.id) {
+        if (state.currentTask?.id === taskId) {
           state.currentTask = action.payload;
         }
       })
       .addCase(toggleTaskCompletion.rejected, (state, action) => {
         state.error = action.payload || 'Failed to toggle task completion';
+        // Rollback will be handled by the component dispatching rollbackOptimisticUpdate
       });
 
     // Delete task
@@ -281,5 +336,16 @@ const taskSlice = createSlice({
   },
 });
 
-export const { setFilters, clearCurrentTask, clearError } = taskSlice.actions;
+export const {
+  setFilters,
+  clearCurrentTask,
+  clearError,
+  optimisticToggleCompletion,
+  rollbackOptimisticUpdate,
+  clearOptimisticUpdate,
+  addToRetryQueue,
+  removeFromRetryQueue,
+  clearRetryQueue,
+} = taskSlice.actions;
+
 export default taskSlice.reducer;

@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
-import { ThemeProvider, CssBaseline, Box } from '@mui/material';
-import { Provider } from 'react-redux';
-import { store } from './store/store';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { Container, Box, Typography, Fab } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 import theme from './theme/theme';
 import TaskList from './components/TaskList/TaskList';
 import TaskForm from './components/TaskForm/TaskForm';
-import { Task, TaskRequest } from './types/task.types';
-import { useAppDispatch } from './store/hooks';
-import { createTask, updateTask } from './store/slices/taskSlice';
+import ErrorBoundary from './components/common/ErrorBoundary';
+import { Task } from './types/task.types';
 
-const AppContent: React.FC = () => {
-  const dispatch = useAppDispatch();
+function App() {
   const [formOpen, setFormOpen] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
 
   const handleAddTask = () => {
-    setEditingTask(null);
+    setEditingTask(undefined);
     setFormOpen(true);
   };
 
@@ -26,45 +25,80 @@ const AppContent: React.FC = () => {
 
   const handleCloseForm = () => {
     setFormOpen(false);
-    setEditingTask(null);
+    setEditingTask(undefined);
   };
 
-  const handleSubmitForm = async (taskData: TaskRequest) => {
-    try {
-      if (editingTask) {
-        await dispatch(updateTask({ id: editingTask.id, task: taskData })).unwrap();
-      } else {
-        await dispatch(createTask(taskData)).unwrap();
-      }
-      handleCloseForm();
-    } catch (error) {
-      // Error is handled by Redux slice and displayed in UI
-      console.error('Failed to save task:', error);
-    }
+  const handleSubmitForm = () => {
+    setFormOpen(false);
+    setEditingTask(undefined);
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <TaskList onAddTask={handleAddTask} onEditTask={handleEditTask} />
-      <TaskForm
-        open={formOpen}
-        task={editingTask}
-        onClose={handleCloseForm}
-        onSubmit={handleSubmitForm}
-      />
-    </Box>
-  );
-};
-
-const App: React.FC = () => {
-  return (
-    <Provider store={store}>
+    <ErrorBoundary>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <AppContent />
+        <Box
+          sx={{
+            minHeight: '100vh',
+            bgcolor: 'background.default',
+            py: 4,
+          }}
+        >
+          <Container maxWidth="lg">
+            <Box mb={4} textAlign="center">
+              <Typography
+                variant="h3"
+                component="h1"
+                gutterBottom
+                color="primary"
+                fontWeight="bold"
+              >
+                Task Management System
+              </Typography>
+              <Typography variant="subtitle1" color="text.secondary">
+                Organize your tasks efficiently
+              </Typography>
+            </Box>
+
+            <ErrorBoundary
+              fallback={
+                <Box textAlign="center" py={4}>
+                  <Typography variant="h6" color="error" gutterBottom>
+                    Failed to load tasks
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Please refresh the page to try again
+                  </Typography>
+                </Box>
+              }
+            >
+              <TaskList onAddTask={handleAddTask} onEditTask={handleEditTask} />
+            </ErrorBoundary>
+
+            <TaskForm
+              open={formOpen}
+              task={editingTask}
+              onClose={handleCloseForm}
+              onSubmit={handleSubmitForm}
+            />
+
+            <Fab
+              color="primary"
+              aria-label="add task"
+              onClick={handleAddTask}
+              sx={{
+                position: 'fixed',
+                bottom: 24,
+                right: 24,
+              }}
+            >
+              <AddIcon />
+            </Fab>
+          </Container>
+        </Box>
       </ThemeProvider>
-    </Provider>
+    </ErrorBoundary>
   );
-};
+}
 
 export default App;
